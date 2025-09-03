@@ -12,7 +12,7 @@
 
 \- \*\*Network:\*\* BNB Smart Chain (BSC)  
 
-\- \*\*Live Link:\*\* \[View on BscScan](https://bscscan.com/address/0xa73a2e3731b781e8fc48095ea5b876c0b1c4e766)  
+\- \*\*Live Link:\*\* https://bscscan.com/address/0xa73a2e3731b781e8fc48095ea5b876c0b1c4e766
 
 \- \*\*Liquidity:\*\* PancakeSwap  
 
@@ -24,11 +24,11 @@
 
 <p align="center">
 
-&nbsp; <img src="assets/ss1.png" width="250"/>
+&nbsp; <img src="assets/ss1.jpg" width="250"/>
 
-&nbsp; <img src="assets/ss2.png" width="250"/>
+&nbsp; <img src="assets/ss2.jpg" width="250"/>
 
-&nbsp; <img src="assets/ss3.png" width="250"/>
+&nbsp; <img src="assets/ss3.jpg" width="250"/>
 
 </p>
 
