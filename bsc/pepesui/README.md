@@ -24,11 +24,11 @@
 
 <p align="center">
 
-&nbsp; <img src="assets/ss1.jpg" width="250"/>
+&nbsp; <img src="assets/ss1.jpg" width="80%"/>
 
-&nbsp; <img src="assets/ss2.jpg" width="250"/>
+&nbsp; <img src="assets/ss2.jpg" width="80%"/>
 
-&nbsp; <img src="assets/ss3.jpg" width="250"/>
+&nbsp; <img src="assets/ss3.jpg" width="80%"/>
 
 </p>
 
