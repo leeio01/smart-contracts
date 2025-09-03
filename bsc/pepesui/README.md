@@ -1,13 +1,25 @@
-TOKEN NAME: PEPE SUI
-TOKEN SYMBOL: PEPES
-SMART CONTRACT ADDRESS: 0xA73a2E3731B781e8fC48095ea5B876C0b1C4E766
-VERIFICATION: VERIFIED
-Network: BNB SMART CHAIN (BSC)
+\# PEPE SUI (PEPES)
 
-LIVE LINK: https://bscscan.com/address/0xa73a2e3731b781e8fc48095ea5b876c0b1c4e766
-LIQUIDITY: PANCAKESWAP
-TOOL: REMIX IDE
-LANGUAGE: SOLIDITY
+
+
+\- \*\*Token Name:\*\* PEPE SUI  
+
+\- \*\*Token Symbol:\*\* PEPES  
+
+\- \*\*Smart Contract Address:\*\* 0xA73a2E3731B781e8fC48095ea5B876C0b1C4E766  
+
+\- \*\*Verification:\*\* VERIFIED  
+
+\- \*\*Network:\*\* BNB Smart Chain (BSC)  
+
+\- \*\*Live Link:\*\* \[View on BscScan](https://bscscan.com/address/0xa73a2e3731b781e8fc48095ea5b876c0b1c4e766)  
+
+\- \*\*Liquidity:\*\* PancakeSwap  
+
+\- \*\*Tool:\*\* Remix IDE  
+
+\- \*\*Language:\*\* Solidity  
+
 
 
 <p align="center">
@@ -19,4 +31,6 @@ LANGUAGE: SOLIDITY
 &nbsp; <img src="assets/ss3.png" width="250"/>
 
 </p>
+
+
 
