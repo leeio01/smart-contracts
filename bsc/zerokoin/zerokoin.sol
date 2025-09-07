@@ -43,7 +43,7 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
         _;
     }
 
-    constructor() ERC20("ZERO KOIN", "ZRK") {
+    constructor() ERC20("ZERO KOIN", "ZRK") Ownable(msg.sender) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 
@@ -115,34 +115,35 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
     function sweepCollectedFees(address to, uint256 amount) external onlyOwner nonReentrant {
         uint256 bal = balanceOf(address(this));
         require(amount > 0 && amount <= bal, "Invalid sweep amount");
-        _transfer(address(this), to, amount);
+        _transferWithChecks(address(this), to, amount);
         emit CollectedFeesSwept(to, amount);
     }
 
     receive() external payable {}
 
-    function _transfer(address from, address to, uint256 amount) internal override {
-        require(from != address(0) && to != address(0), "Zero address");
+    // Custom transfer function with your rules
+    function _transferWithChecks(address sender, address recipient, uint256 amount) internal {
+        require(sender != address(0) && recipient != address(0), "Zero address");
         require(amount > 0, "Amount must be > 0");
 
         if (maxGasPrice > 0) {
             require(tx.gasprice <= maxGasPrice, "Gas price above allowed limit");
         }
 
-        bool isBuy = (from == dexPair) && (dexPair != address(0));
-        bool isSell = (to == dexPair) && (dexPair != address(0));
+        bool isBuy = (sender == dexPair) && (dexPair != address(0));
+        bool isSell = (recipient == dexPair) && (dexPair != address(0));
         bool isTradeWithPair = isBuy || isSell;
 
         if (isTradeWithPair && !tradingEnabled) {
-            require(from == owner() || to == owner(), "Trading not enabled");
+            require(sender == owner() || recipient == owner(), "Trading not enabled");
         }
 
         if (isBuy) {
-            require(block.timestamp - lastTradeTimestamp[to] >= tradeDelay, "Buy cooldown active");
-            lastTradeTimestamp[to] = block.timestamp;
+            require(block.timestamp - lastTradeTimestamp[recipient] >= tradeDelay, "Buy cooldown active");
+            lastTradeTimestamp[recipient] = block.timestamp;
         } else if (isSell) {
-            require(block.timestamp - lastTradeTimestamp[from] >= tradeDelay, "Sell cooldown active");
-            lastTradeTimestamp[from] = block.timestamp;
+            require(block.timestamp - lastTradeTimestamp[sender] >= tradeDelay, "Sell cooldown active");
+            lastTradeTimestamp[sender] = block.timestamp;
         }
 
         if (maxTxPercent > 0) {
@@ -152,19 +153,31 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
 
         uint256 transferAmount = amount;
 
-        if (taxPercent > 0 && isTradeWithPair && from != owner() && to != owner()) {
+        if (taxPercent > 0 && isTradeWithPair && sender != owner() && recipient != owner()) {
             uint256 fee = (amount * taxPercent) / 100;
             if (fee > 0) {
-                super._transfer(from, address(this), fee);
+                super._transfer(sender, address(this), fee);
                 transferAmount = amount - fee;
             }
         }
 
-        if (maxWalletPercent > 0 && to != dexPair) {
+        if (maxWalletPercent > 0 && recipient != dexPair) {
             uint256 maxWalletAmount = (totalSupply() * maxWalletPercent) / 100;
-            require(balanceOf(to) + transferAmount <= maxWalletAmount, "Recipient would exceed max wallet limit");
+            require(balanceOf(recipient) + transferAmount <= maxWalletAmount, "Recipient would exceed max wallet limit");
         }
 
-        super._transfer(from, to, transferAmount);
+        super._transfer(sender, recipient, transferAmount);
+    }
+
+    // Override ERC20's transfer functions to use our custom checks
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        _transferWithChecks(_msgSender(), recipient, amount);
+        return true;
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
+        _spendAllowance(sender, _msgSender(), amount);
+        _transferWithChecks(sender, recipient, amount);
+        return true;
     }
 }
