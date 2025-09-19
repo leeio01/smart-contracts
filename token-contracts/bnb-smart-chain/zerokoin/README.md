@@ -6,7 +6,7 @@
 
 \- **\*\*Token Symbol:\*\*** ZRK
 
-\- **\*\*Smart Contract Address (testnet):\*\*** 0x220c0a61747832bf6f61cb181d4adf72daf05014 
+\- **\*\*Smart Contract Address (testnet):\*\*** 0x1C91975E11483F099B833EB3BfF6A677288d873B
 
 \- **\*\*Smart Contract Address(mainnet):\*\*** 0x220c0a61747832bf6f61cb181d4adf72daf05014  
 
