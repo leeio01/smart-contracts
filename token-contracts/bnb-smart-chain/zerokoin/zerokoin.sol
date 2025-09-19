@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -13,8 +13,9 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
     bool public tradingEnabled = false;
     bool public modificationsAllowed = true;
     address public dexPair;
-    uint256 public tradeDelay = 30;
-    mapping(address => uint256) public lastTradeTimestamp;
+
+    uint256 public tradeDelaySeconds = 60;
+    mapping(address => uint256) public lastTradeTime;
 
     uint256 public maxGasPrice = 0;
 
@@ -31,7 +32,7 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
     event TaxPercentUpdated(uint8 newTax);
     event MaxWalletPercentUpdated(uint8 newMax);
     event MaxTxPercentUpdated(uint8 newMaxTx);
-    event TradeDelayUpdated(uint256 newDelay);
+    event TradeDelaySecondsUpdated(uint256 newDelay);
     event MaxGasPriceUpdated(uint256 newMaxGas);
     event DexPairUpdated(address pair);
     event WithdrawnBNB(address indexed to, uint256 amount);
@@ -43,7 +44,7 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
         _;
     }
 
-    constructor() ERC20("ZERO KOIN", "ZRK") Ownable(msg.sender) {
+    constructor() ERC20("Zero Koin", "ZRK") Ownable(msg.sender) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 
@@ -79,10 +80,10 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
         emit MaxTxPercentUpdated(_pct);
     }
 
-    function setTradeDelay(uint256 _seconds) external onlyOwner onlyWhenModifiable {
-        require(_seconds <= 86400, "Delay too long");
-        tradeDelay = _seconds;
-        emit TradeDelayUpdated(_seconds);
+    function setTradeDelaySeconds(uint256 _seconds) external onlyOwner onlyWhenModifiable {
+        require(_seconds <= 3600, "Delay too long");
+        tradeDelaySeconds = _seconds;
+        emit TradeDelaySecondsUpdated(_seconds);
     }
 
     function setMaxGasPrice(uint256 _maxGasWei) external onlyOwner onlyWhenModifiable {
@@ -121,7 +122,6 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
 
     receive() external payable {}
 
-    // Custom transfer function with your rules
     function _transferWithChecks(address sender, address recipient, uint256 amount) internal {
         require(sender != address(0) && recipient != address(0), "Zero address");
         require(amount > 0, "Amount must be > 0");
@@ -138,12 +138,10 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
             require(sender == owner() || recipient == owner(), "Trading not enabled");
         }
 
-        if (isBuy) {
-            require(block.timestamp - lastTradeTimestamp[recipient] >= tradeDelay, "Buy cooldown active");
-            lastTradeTimestamp[recipient] = block.timestamp;
-        } else if (isSell) {
-            require(block.timestamp - lastTradeTimestamp[sender] >= tradeDelay, "Sell cooldown active");
-            lastTradeTimestamp[sender] = block.timestamp;
+        if (isTradeWithPair) {
+            address user = isBuy ? recipient : sender;
+            require(block.timestamp >= lastTradeTime[user] + tradeDelaySeconds, "Trade cooldown active");
+            lastTradeTime[user] = block.timestamp;
         }
 
         if (maxTxPercent > 0) {
@@ -169,7 +167,6 @@ contract ZEROKOIN is ERC20, Ownable, ReentrancyGuard {
         super._transfer(sender, recipient, transferAmount);
     }
 
-    // Override ERC20's transfer functions to use our custom checks
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         _transferWithChecks(_msgSender(), recipient, amount);
         return true;
