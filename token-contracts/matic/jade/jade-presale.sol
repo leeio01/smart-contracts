@@ -10,28 +10,22 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 contract Presale is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    IERC20 public immutable saleToken; 
-    uint256 public rate; // tokens per 1 MATIC (wei)
-
+    IERC20 public immutable saleToken;
+    uint256 public rate;
     uint256 public startTime;
     uint256 public endTime;
-
     uint256 public softCap;
     uint256 public hardCap;
-
     uint256 public minContribution;
     uint256 public maxContribution;
-
-    uint256 public totalRaisedWeiEquivalent; 
+    uint256 public totalRaisedWeiEquivalent;
     bool public finalized;
-
     bool public whitelistOnly;
-    mapping(address => bool) public isWhitelisted;
 
-    mapping(address => uint256) public contributionsNativeWei; 
+    mapping(address => bool) public isWhitelisted;
+    mapping(address => uint256) public contributionsNativeWei;
     mapping(address => mapping(address => uint256)) public contributionsTokenAmount;
     mapping(address => uint256) public totalContributedPerERC20;
-
     mapping(address => uint256) public purchased;
     mapping(address => bool) public claimed;
 
@@ -62,11 +56,11 @@ contract Presale is Ownable, ReentrancyGuard {
         uint256 _hardCapWeiEq,
         uint256 _minContributionWei,
         uint256 _maxContributionWei
-    ) {
-        require(_saleToken != address(0), "sale token zero");
-        require(_rate > 0, "rate 0");
-        require(_startTime < _endTime, "bad times");
-        require(_softCapWeiEq <= _hardCapWeiEq, "soft>hard");
+    ) Ownable(msg.sender) {
+        require(_saleToken != address(0));
+        require(_rate > 0);
+        require(_startTime < _endTime);
+        require(_softCapWeiEq <= _hardCapWeiEq);
 
         saleToken = IERC20(_saleToken);
         rate = _rate;
@@ -79,24 +73,24 @@ contract Presale is Ownable, ReentrancyGuard {
     }
 
     modifier whenSaleActive() {
-        require(block.timestamp >= startTime && block.timestamp <= endTime, "sale inactive");
-        require(!finalized, "finalized");
+        require(block.timestamp >= startTime && block.timestamp <= endTime);
+        require(!finalized);
         _;
     }
 
     function setRate(uint256 _rate) external onlyOwner {
-        require(_rate > 0, "rate 0");
+        require(_rate > 0);
         rate = _rate;
     }
 
     function setTimes(uint256 _start, uint256 _end) external onlyOwner {
-        require(_start < _end, "bad times");
+        require(_start < _end);
         startTime = _start;
         endTime = _end;
     }
 
     function setCaps(uint256 _soft, uint256 _hard) external onlyOwner {
-        require(_soft <= _hard, "soft>hard");
+        require(_soft <= _hard);
         softCap = _soft;
         hardCap = _hard;
     }
@@ -123,7 +117,7 @@ contract Presale is Ownable, ReentrancyGuard {
     }
 
     function addOrUpdatePayToken(address tokenAddr, uint256 priceInWeiPerWholeToken, bool enabled) external onlyOwner {
-        require(tokenAddr != address(0), "zero token");
+        require(tokenAddr != address(0));
         IERC20 t = IERC20(tokenAddr);
         uint8 decimals = IERC20Metadata(tokenAddr).decimals();
 
@@ -146,15 +140,15 @@ contract Presale is Ownable, ReentrancyGuard {
 
     function buy() external payable nonReentrant whenSaleActive {
         if (whitelistOnly) {
-            require(isWhitelisted[msg.sender], "not whitelisted");
+            require(isWhitelisted[msg.sender]);
         }
         uint256 value = msg.value;
-        require(value >= minContribution, "below min");
+        require(value >= minContribution);
         uint256 newContributionWei = contributionsNativeWei[msg.sender] + value;
-        require(newContributionWei <= maxContribution, "over max per address");
+        require(newContributionWei <= maxContribution);
 
         uint256 newTotalWeiEq = totalRaisedWeiEquivalent + value;
-        require(newTotalWeiEq <= hardCap, "hard cap reached");
+        require(newTotalWeiEq <= hardCap);
 
         uint256 tokenAmount = (value * rate) / 1e18;
 
@@ -167,22 +161,22 @@ contract Presale is Ownable, ReentrancyGuard {
 
     function buyWithToken(address payTokenAddr, uint256 amount) external nonReentrant whenSaleActive {
         if (whitelistOnly) {
-            require(isWhitelisted[msg.sender], "not whitelisted");
+            require(isWhitelisted[msg.sender]);
         }
         PayToken storage p = payTokens[payTokenAddr];
-        require(p.enabled, "payment token not accepted");
-        require(amount > 0, "zero amount");
+        require(p.enabled);
+        require(amount > 0);
 
         p.token.safeTransferFrom(msg.sender, address(this), amount);
 
         uint256 weiEq = (amount * p.priceInWeiPerWholeToken) / (10 ** p.decimals);
-        require(weiEq >= minContribution, "below min equivalent");
+        require(weiEq >= minContribution);
 
         uint256 userTotalAfter = contributionsNativeWei[msg.sender] + _sumUserERC20WeiEq(msg.sender) + weiEq;
-        require(userTotalAfter <= maxContribution, "over max per address");
+        require(userTotalAfter <= maxContribution);
 
         uint256 newTotalAfter = totalRaisedWeiEquivalent + weiEq;
-        require(newTotalAfter <= hardCap, "hard cap reached");
+        require(newTotalAfter <= hardCap);
 
         uint256 tokenAmount = (weiEq * rate) / 1e18;
 
@@ -208,42 +202,42 @@ contract Presale is Ownable, ReentrancyGuard {
     }
 
     function claimRefundNative() external nonReentrant {
-        require(block.timestamp > endTime, "sale not ended");
-        require(totalRaisedWeiEquivalent < softCap, "soft cap reached");
+        require(block.timestamp > endTime);
+        require(totalRaisedWeiEquivalent < softCap);
         uint256 contributed = contributionsNativeWei[msg.sender];
-        require(contributed > 0, "no contribution");
+        require(contributed > 0);
 
         contributionsNativeWei[msg.sender] = 0;
         purchased[msg.sender] = 0;
 
         (bool success, ) = payable(msg.sender).call{value: contributed}("");
-        require(success, "refund failed");
+        require(success);
 
         emit RefundedNative(msg.sender, contributed);
     }
 
     function claimRefundERC20(address payTokenAddr) external nonReentrant {
-        require(block.timestamp > endTime, "sale not ended");
-        require(totalRaisedWeiEquivalent < softCap, "soft cap reached");
+        require(block.timestamp > endTime);
+        require(totalRaisedWeiEquivalent < softCap);
         uint256 amt = contributionsTokenAmount[msg.sender][payTokenAddr];
-        require(amt > 0, "no contribution for token");
+        require(amt > 0);
 
         contributionsTokenAmount[msg.sender][payTokenAddr] = 0;
         purchased[msg.sender] = 0;
 
         PayToken storage p = payTokens[payTokenAddr];
-        require(address(p.token) != address(0), "unknown token");
+        require(address(p.token) != address(0));
 
         p.token.safeTransfer(msg.sender, amt);
         emit RefundedERC20(msg.sender, payTokenAddr, amt);
     }
 
     function claimTokens() external nonReentrant {
-        require(finalized, "not finalized");
-        require(totalRaisedWeiEquivalent >= softCap, "sale failed");
-        require(!claimed[msg.sender], "already claimed");
+        require(finalized);
+        require(totalRaisedWeiEquivalent >= softCap);
+        require(!claimed[msg.sender]);
         uint256 amount = purchased[msg.sender];
-        require(amount > 0, "no tokens to claim");
+        require(amount > 0);
 
         claimed[msg.sender] = true;
         saleToken.safeTransfer(msg.sender, amount);
@@ -251,48 +245,48 @@ contract Presale is Ownable, ReentrancyGuard {
     }
 
     function finalize() external onlyOwner {
-        require(block.timestamp > endTime, "sale not ended");
-        require(!finalized, "already finalized");
+        require(block.timestamp > endTime);
+        require(!finalized);
         finalized = true;
         emit Finalized(totalRaisedWeiEquivalent >= softCap, totalRaisedWeiEquivalent);
     }
 
     function withdrawRaisedNative(address payable to) external onlyOwner nonReentrant {
-        require(finalized, "not finalized");
-        require(totalRaisedWeiEquivalent >= softCap, "soft cap not reached");
+        require(finalized);
+        require(totalRaisedWeiEquivalent >= softCap);
         uint256 balance = address(this).balance;
-        require(balance > 0, "no funds");
+        require(balance > 0);
         (bool success, ) = to.call{value: balance}("");
-        require(success, "withdraw failed");
+        require(success);
     }
 
     function withdrawRaisedERC20(address payTokenAddr, address to) external onlyOwner {
-        require(finalized, "not finalized");
-        require(totalRaisedWeiEquivalent >= softCap, "soft cap not reached");
+        require(finalized);
+        require(totalRaisedWeiEquivalent >= softCap);
         PayToken storage p = payTokens[payTokenAddr];
-        require(address(p.token) != address(0), "unknown token");
+        require(address(p.token) != address(0));
         uint256 bal = p.token.balanceOf(address(this));
-        require(bal > 0, "no token funds");
+        require(bal > 0);
         p.token.safeTransfer(to, bal);
     }
 
     function withdrawUnsoldSaleTokens(address to) external onlyOwner {
-        require(finalized, "not finalized");
+        require(finalized);
         uint256 contractTokenBal = saleToken.balanceOf(address(this));
-        require(contractTokenBal > 0, "no tokens");
+        require(contractTokenBal > 0);
         saleToken.safeTransfer(to, contractTokenBal);
     }
 
     function rescueERC20(address erc20, address to) external onlyOwner {
-        require(erc20 != address(saleToken), "cannot rescue sale token");
+        require(erc20 != address(saleToken));
         IERC20(erc20).safeTransfer(to, IERC20(erc20).balanceOf(address(this)));
     }
 
     receive() external payable {
-        revert("use buy()");
+        revert();
     }
 
     fallback() external payable {
-        revert("use buy()");
+        revert();
     }
 }
