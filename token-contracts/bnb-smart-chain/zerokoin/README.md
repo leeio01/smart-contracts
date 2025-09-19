@@ -1,20 +1,22 @@
-\# PEPE SUI (PEPES)
+\# Zero Koin (ZRK)
 
 
 
-\- **\*\*Token Name:\*\*** PEPE SUI  
+\- **\*\*Token Name:\*\*** Zero Koin  
 
-\- **\*\*Token Symbol:\*\*** PEPES  
+\- **\*\*Token Symbol:\*\*** ZRK
 
-\- **\*\*Smart Contract Address:\*\*** 0xA73a2E3731B781e8fC48095ea5B876C0b1C4E766  
+\- **\*\*Smart Contract Address (testnet):\*\*** 0x220c0a61747832bf6f61cb181d4adf72daf05014 
+
+\- **\*\*Smart Contract Address(mainnet):\*\*** 0x220c0a61747832bf6f61cb181d4adf72daf05014  
 
 \- **\*\*Verification:\*\*** VERIFIED  
 
 \- **\*\*Network:\*\*** BNB Smart Chain (BSC)  
 
-\- **\*\*Live Link:\*\*** https://bscscan.com/address/0xa73a2e3731b781e8fc48095ea5b876c0b1c4e766  
+\- **\*\*Live Link:\*\*** https://bscscan.com/token/0x220c0a61747832bf6f61cb181d4adf72daf05014
 
-\- **\*\*Liquidity:\*\*** PancakeSwap  
+\- **\*\*Liquidity:\*\*** PancakeSwap
 
 \- **\*\*Tool:\*\*** Remix IDE  
 
