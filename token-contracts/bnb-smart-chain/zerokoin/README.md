@@ -26,23 +26,23 @@
 
 <p align="center">
 
-&nbsp; <img src="assets/ss1.jpg" width="80%"/>
+&nbsp; <img src="assets/ss1.png" width="80%"/>
 
-&nbsp; <img src="assets/ss2.jpg" width="80%"/>
+&nbsp; <img src="assets/ss2.png" width="80%"/>
 
-&nbsp; <img src="assets/ss3.jpg" width="80%"/>
+&nbsp; <img src="assets/ss3.png" width="80%"/>
 
-&nbsp; <img src="assets/ss4.jpg" width="80%"/>
+&nbsp; <img src="assets/ss4.png" width="80%"/>
 
-&nbsp; <img src="assets/sss1.jpg" width="80%"/>
+&nbsp; <img src="assets/sss1.png" width="80%"/>
 
-&nbsp; <img src="assets/sss2.jpg" width="80%"/>
+&nbsp; <img src="assets/sss2.png" width="80%"/>
 
-&nbsp; <img src="assets/sss3.jpg" width="80%"/>
+&nbsp; <img src="assets/sss3.png" width="80%"/>
 
-&nbsp; <img src="assets/sss4.jpg" width="80%"/>
+&nbsp; <img src="assets/sss4.png" width="80%"/>
 
-&nbsp; <img src="assets/sss5.jpg" width="80%"/>
+&nbsp; <img src="assets/sss5.png" width="80%"/>
 
 </p>
 
